@@ -35,7 +35,7 @@ int main(void)
         {
             poem_buffer[i] = '\0';
             indicator_poem_buffer[pointer] = &(poem_buffer[i + 1]);
-            fprintf(stderr, "bebra: %p\n", &poem_buffer[i]);
+            fprintf(stderr, "bebra[%d]: %p\n", pointer, &poem_buffer[i]);
             pointer++;
         }
     }
