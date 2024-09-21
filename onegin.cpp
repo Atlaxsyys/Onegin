@@ -1,17 +1,18 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include "sort.h"
+#include <assert.h>
 
-void sort(const char* indicator_poem_buffer[], int counter);
 long size_onegin(FILE* fp);
 int n_string(char* poem_buffer, long count);
+void output(const char** indicator_poem_buffer, FILE* output_onegin, int counter_string);
 
-int main(void)
+int main(void) // TODO argc argv, аргументы командной строки
 {
-    FILE* file_of_onegin = (fopen("onegin.txt", "r"));
+    FILE* file_of_onegin = fopen("onegin.txt", "r");
     if (file_of_onegin == NULL)
     {
-        printf("ERROR");
+        fprintf(stderr, "ERROR\n");
         return 0;
     }
 
@@ -19,70 +20,52 @@ int main(void)
 
     char* poem_buffer = (char*)calloc((size_t)size_file + 1, sizeof(char));
 
-    long count = fread(poem_buffer, 1, (size_t)size_file, file_of_onegin);
-    fclose(file_of_onegin);
-    printf("%s\n", poem_buffer);
+    fprintf(stderr, "poem_buffer: [%p, %p]", poem_buffer, poem_buffer + size_file);
 
-    int counter_string = n_string(poem_buffer, count);
-    printf("%d\n", counter_string);
-    const char* indicator_poem_buffer[counter_string] = {};
+    long count = fread(poem_buffer, sizeof(char), (size_t)size_file, file_of_onegin);
+    fclose(file_of_onegin);
+    // fprintf(stderr, "poem_buffer + file_size: %p\n", poem_buffer + size_file);
+
+    size_t counter_string = n_string(poem_buffer, count);
+    const char** indicator_poem_buffer = (const char**)calloc((size_t)counter_string, sizeof(char*));
     int pointer = 1;
-    fprintf(stderr, "bebra: %p\n", &poem_buffer[0]);
     indicator_poem_buffer[0] = &(poem_buffer[0]);
+    //fprintf(stderr, "zalupa"); 
     for (int i = 0; i < count; i++)
     {
+        assert(&(poem_buffer[i]) != NULL);
         if (poem_buffer[i] == '\n')
         {
             poem_buffer[i] = '\0';
             indicator_poem_buffer[pointer] = &(poem_buffer[i + 1]);
-            fprintf(stderr, "bebra[%d]: %p\n", pointer, &poem_buffer[i]);
             pointer++;
         }
     }
+    //fprintf(stderr, "pivo");  
+    sort(indicator_poem_buffer, counter_string, sizeof(char*), compare_str_reserse);
+    fprintf(stderr, "pgfg");
+    FILE* output_onegin = fopen("output.txt", "w");
+    output(indicator_poem_buffer, output_onegin, counter_string);
 
-    //sort(indicator_poem_buffer, counter_string);
+    fclose(output_onegin);
 
-    for (int i = 0; i < counter_string; i++)
-    {
-        printf("%p \n", indicator_poem_buffer[i]);
-    }
 }
 
-void sort(const char* indicator_poem_buffer[], int counter)
+long size_onegin(FILE* file_onegin)
 {
-    for (int j = 0; j < counter; j++)
-    {
-        for (int i = 0; i < counter - 1; i++)
-        {
-            int biger_or_shorter = strcmp(indicator_poem_buffer[i], indicator_poem_buffer[i + 1]);
+    assert(file_onegin != NULL);
 
-            if (biger_or_shorter < 0)
-            {
-                const char* temp = 0;
-                temp = indicator_poem_buffer[i + 1];
-                       indicator_poem_buffer[i + 1] = indicator_poem_buffer[i];
-                                                      indicator_poem_buffer[i] = temp;
-            }
-        }
-    }
-}
-
-long size_onegin(FILE* fp)
-{
-    if (!fp)
-    {
-        return -1;
-    }
-
-    fseek(fp, 0, SEEK_END);
-    long size_oneg = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    fseek(file_onegin, 0, SEEK_END);
+    long size_oneg = ftell(file_onegin);
+    fseek(file_onegin, 0, SEEK_SET);
     
     return size_oneg;
 }
 
 int n_string(char* poem_buffer, long count)
-{       
+{
+    assert(poem_buffer != NULL);
+
     int counter_string = 0;
     for (int pointer = 0; pointer < count; pointer++)
     {
@@ -93,3 +76,15 @@ int n_string(char* poem_buffer, long count)
     }
     return counter_string;
 }
+
+void output(const char** indicator_poem_buffer, FILE* output_onegin, int counter_string)
+{
+    assert(indicator_poem_buffer != NULL);
+
+    for (int i = 0; i < counter_string; i++)
+    {
+        fputs((indicator_poem_buffer[i]), output_onegin);
+        fputs("\n", output_onegin);
+    }
+}
+
