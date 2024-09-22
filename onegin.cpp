@@ -24,13 +24,11 @@ int main(void) // TODO argc argv, аргументы командной стро
 
     long count = fread(poem_buffer, sizeof(char), (size_t)size_file, file_of_onegin);
     fclose(file_of_onegin);
-    // fprintf(stderr, "poem_buffer + file_size: %p\n", poem_buffer + size_file);
 
     size_t counter_string = n_string(poem_buffer, count);
-    const char** indicator_poem_buffer = (const char**)calloc((size_t)counter_string, sizeof(char*));
+    const char** indicator_poem_buffer = (const char**)calloc((size_t)counter_string + 1, sizeof(char*));
     int pointer = 1;
     indicator_poem_buffer[0] = &(poem_buffer[0]);
-    //fprintf(stderr, "zalupa"); 
     for (int i = 0; i < count; i++)
     {
         assert(&(poem_buffer[i]) != NULL);
@@ -41,14 +39,17 @@ int main(void) // TODO argc argv, аргументы командной стро
             pointer++;
         }
     }
-    //fprintf(stderr, "pivo");  
+
     sort(indicator_poem_buffer, counter_string, sizeof(char*), compare_str_reserse);
-    fprintf(stderr, "pgfg");
     FILE* output_onegin = fopen("output.txt", "w");
     output(indicator_poem_buffer, output_onegin, counter_string);
 
     fclose(output_onegin);
 
+    free(indicator_poem_buffer);
+    free(poem_buffer);
+
+    return 0;
 }
 
 long size_onegin(FILE* file_onegin)
