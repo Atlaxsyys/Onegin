@@ -26,10 +26,10 @@ void sort(void* indicator_poem_buffer, size_t counter, size_t size_element, int 
             int biger_or_shorter = compare_str_reserse(element_first, element_second);
             if (biger_or_shorter > 0)
             {
-                swap(&element_first, &element_second);
+                swap(element_first, element_second);
                 if (element_first_copy == element_second && element_second_copy == element_first)
                 {
-                    fprintf(stderr, "OK");
+                     fprintf(stderr, "OK");
                 }
 
             }
@@ -59,46 +59,50 @@ int my_strcmp(const char* str_first, const char* str_second)
     }
 }
 
-int my_strcmp_reverse(const char* str_first, const char* str_second)
+
+int my_strcmp_reverse(const char* str_first, const char* str_second) 
 {
     assert(str_first != NULL);
     assert(str_second != NULL);
-    size_t len_first = strlen(str_first);
-    size_t len_second = strlen(str_second);
-    
-    const char* str_first_copy = str_first;
-    const char* str_second_copy = str_second;
-    
-    str_first += len_first;
-    str_second += len_second;
-    while ((str_first > str_first_copy) && (str_second > str_second_copy))
+    int len_first = strlen(str_first);
+    int len_second = strlen(str_second);
+
+    const char* p_first = str_first + len_first - 1;
+    const char* p_second = str_second + len_second - 1;
+
+    while (p_first >= str_first && p_second >= str_second)
     {
-        if (tolower(*str_first) > tolower(*str_second))
-        {
+        if (tolower(*p_first) > tolower(*p_second)) {
             return bigger;
-        }
-        else if (tolower(*str_first) < tolower(*str_second))  
-        {
+        } else if (tolower(*p_first) < tolower(*p_second)) {
             return smaller;
         }
-        str_first -= sizeof(char*);
-        str_second -= sizeof(char*);
+        p_first--;
+        p_second--;
+    }
+
+    if (len_first > len_second) 
+    {
+        return bigger;
+    } 
+    else if (len_first < len_second) 
+    {
+        return smaller;
     }
     return equality;
 }
 
 void swap(void* str1, void* str2)
 {
-    char* str_first = (char*) str1;
-    char* str_second = (char*) str2;
+    char** str_first = (char**) str1;
+    char** str_second = (char**) str2;
     char* temp = 0;
-    temp = str_second;
-           str_second = str_first;
-                        str_first = temp;
+    temp = *str_second;
+           *str_second = *str_first;
+                        *str_first = temp;
 }
 
 int compare_str_reserse(void* str1, void* str2)
 {
     return my_strcmp_reverse(*(char**)str1, *(char**)str2);
-    
 }
